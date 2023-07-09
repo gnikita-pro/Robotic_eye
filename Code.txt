@@ -1,0 +1,178 @@
+#include<Servo.h>
+int trigPin = 6;    // TRIG pin
+int echoPin = 7;    // ECHO pin
+int leftpin=2;      // Left sensor pin
+int rightpin=3;     // Right sensor pin
+float duration_us, distance_cm;
+Servo myservo1;     
+Servo myservo2;
+Servo myservo3;
+Servo myservo4;
+void setup() {
+  // begin serial port
+  Serial.begin (9600);
+  // attaching servo motor at respective digital pins
+myservo1.attach(8);  
+myservo2.attach(9);
+myservo3.attach(10);
+myservo4.attach(11);
+  // configure the trigger pin to output mode
+  pinMode(trigPin, OUTPUT);
+  // configure the echo pin to input mode
+  pinMode(echoPin, INPUT);
+  // configure the left and right sensor to input mode
+  pinMode(leftpin,INPUT);
+  pinMode(rightpin,INPUT);
+}
+// function to open eye
+void eye_open()
+{
+  delay(500); // opening eye after 0.5 sec
+  myservo1.write(30); // servo1 will move 30 degree from its initial position to open eye
+  myservo2.write(160);  //servo2 will move 160 degree from its initial position to open eye
+} 
+void eye_close() // closing of eye
+{
+
+  delay(500);
+  myservo1.write(90); // servo1 will come to its initial position 90 degree for closing eye
+  myservo2.write(90); // servo2 will come to its initial position 90 degree for closing eye
+}
+
+void Blink() //eye will blink
+{
+
+  delay(500); // after 0.5 sec eyes open
+  myservo1.write(90); // servo1 will come to its initial position 90 degree for closing eye
+  myservo2.write(90);  // servo2 will come to its initial position 90 degree for closing eye
+  
+  delay(500);
+  myservo1.write(30);  // servo1 will move 30 degree from its initial position to open eye
+  myservo2.write(160);  //servo2 will move 160 degree from its initial position to open eye
+
+  }
+ void Turn_Right() // both pupil will turn right
+ {
+
+myservo3.write(180);  // servo3 will turn 180 degree for turning right
+myservo4.write(180);  // servo4 will turn 180 degree for turning right
+
+
+  }
+  void Center() // eyes will come to center
+  {
+myservo3.write(90); // servo3 will come to its initial position 90 degree for closing eye
+myservo4.write(90);  // servo4 will come to its initial position 90 degree for closing eye
+
+    }
+void Turn_Left()  // both pupil will turn left
+  {
+myservo3.write(0); // servo3 will turn 0 degree for turning left
+myservo4.write(0); // servo4 will turn 0 degree for turning left
+
+
+    }
+void inner_eye() 
+{
+ myservo3.write(180);
+ myservo4.write(0);
+  }
+void loop() {
+  int LeftSensor_Value= digitalRead(leftpin);  // reading the value from digital pin 
+  int RightSensor_Value=digitalRead(rightpin);  // reading the value from digital pin
+  
+  // generate 10-microsecond pulse to TRIG pin
+  digitalWrite(trigPin, HIGH); // trigpin will activate for 10 micro sec
+  delayMicroseconds(30);
+  digitalWrite(trigPin, LOW); // trigpin will deactivate
+
+  // measure duration of pulse from ECHO pin
+  duration_us = pulseIn(echoPin, HIGH); // calculating time for wave to return
+
+  // calculate the distance`
+  distance_cm = 0.017 * duration_us;
+
+  // print the value to Serial Monitor
+  Serial.print("distance: "); // measuring distance
+  Serial.print(distance_cm);
+  Serial.println(" cm");
+  Serial.print("Left_sensor");
+  Serial.println(LeftSensor_Value); // measuring left sensor value
+  Serial.print("Right_sensor");
+  Serial.println(RightSensor_Value); // measuring right sensor value
+  
+delay(500);
+  if ((distance_cm<80)&& (distance_cm>10)) 
+  {
+  eye_open();
+  
+   if ((LeftSensor_Value ==0)&&(RightSensor_Value==1))
+   {
+   
+   Turn_Left();
+    
+    }
+    else if ((LeftSensor_Value ==1)&&(RightSensor_Value==0))
+    {
+       Turn_Right();
+      
+      
+      }
+    else
+     {
+Center();
+delay(2000);
+int LeftSensor_Value= digitalRead(leftpin);
+  int RightSensor_Value=digitalRead(rightpin);
+  
+   if ((LeftSensor_Value ==0)&&(RightSensor_Value==1))
+   {
+   
+   Turn_Left();
+    
+    }
+    else if ((LeftSensor_Value ==1)&&(RightSensor_Value==0))
+    {
+       Turn_Right();
+      
+      
+      }
+     else
+     {
+  int LeftSensor_Value= digitalRead(leftpin);
+  int RightSensor_Value=digitalRead(rightpin);
+  
+   if ((LeftSensor_Value ==0)&&(RightSensor_Value==1))
+   {
+   
+   Turn_Left();
+    
+    }
+    else if ((LeftSensor_Value ==1)&&(RightSensor_Value==0))
+    {
+       Turn_Right();
+      
+      
+      }
+     else
+     {
+      
+Blink();
+     }
+
+     }
+    }
+  
+   }
+   else if (distance_cm<10)
+   {
+    eye_open();
+ inner_eye();
+    }
+else 
+   {
+    Center();
+   eye_close();
+   delay(500);
+    }
+}
